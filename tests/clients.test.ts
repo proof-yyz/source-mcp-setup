@@ -30,15 +30,41 @@ test("resolveTargets throws on unknown name", () => {
   );
 });
 
-test("buildServerEntry produces http + Bearer headers for all clients", () => {
+test("buildServerEntry produces stdio bridge config (npx mcp-remote ...) for all clients", () => {
   for (const name of ALL_CLIENT_NAMES) {
     const entry = CLIENTS[name].buildServerEntry({
       mcpUrl: "https://source.example/api/mcp",
       bearer: "src_test",
     });
     const e = entry as Record<string, unknown>;
-    assert.equal(e.url, "https://source.example/api/mcp");
-    const headers = e.headers as Record<string, string>;
-    assert.equal(headers.Authorization, "Bearer src_test");
+    assert.equal(e.command, "npx");
+    const args = e.args as string[];
+    assert.deepEqual(args, [
+      "-y",
+      "mcp-remote",
+      "https://source.example/api/mcp",
+      "--header",
+      "Authorization: Bearer src_test",
+    ]);
+  }
+});
+
+test("buildServerEntry never embeds the bearer outside args (no headers/env keys leak)", () => {
+  // Defense-in-depth: if a future shape regression adds the bearer to
+  // an env/headers key, this test catches it. The token is only
+  // legitimate inside args[4].
+  for (const name of ALL_CLIENT_NAMES) {
+    const entry = CLIENTS[name].buildServerEntry({
+      mcpUrl: "https://source.example/api/mcp",
+      bearer: "src_secret_xyz",
+    });
+    const e = entry as Record<string, unknown>;
+    assert.equal(
+      e.headers,
+      undefined,
+      `${name} should not have a headers key`,
+    );
+    assert.equal(e.env, undefined, `${name} should not have an env key`);
+    assert.equal(e.url, undefined, `${name} should not have a url key`);
   }
 });
