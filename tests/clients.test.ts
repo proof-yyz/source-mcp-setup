@@ -43,9 +43,27 @@ test("buildServerEntry produces stdio bridge config (npx mcp-remote ...) for all
       "-y",
       "mcp-remote",
       "https://source.example/api/mcp",
+      "--transport",
+      "http-only",
       "--header",
       "Authorization: Bearer src_test",
     ]);
+  }
+});
+
+test("buildServerEntry pins --transport http-only (Source has no SSE)", () => {
+  // Defense against a future regression that drops the flag — without
+  // it, mcp-remote's default http-first strategy sends a GET to the
+  // server, gets 405 HTML, fails JSON parse. Verified 2026-05-02.
+  for (const name of ALL_CLIENT_NAMES) {
+    const entry = CLIENTS[name].buildServerEntry({
+      mcpUrl: "https://source.example/api/mcp",
+      bearer: "src_test",
+    });
+    const args = (entry as Record<string, unknown>).args as string[];
+    const tIdx = args.indexOf("--transport");
+    assert.notEqual(tIdx, -1, `${name} args missing --transport flag`);
+    assert.equal(args[tIdx + 1], "http-only", `${name} should use http-only`);
   }
 });
 

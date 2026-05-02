@@ -55,6 +55,14 @@ function homeJoin(...segments: string[]): string {
 /**
  * Stdio-bridge entry. All three clients accept this shape because it
  * runs `mcp-remote` as a stdio subprocess — universally supported.
+ *
+ * --transport http-only: skip mcp-remote's default SSE probe.
+ * mcp-remote's `http-first` strategy sends a GET to the URL first to
+ * test for SSE support; Source's /api/mcp only implements POST, so
+ * the GET returns 405 with an HTML body that mcp-remote can't parse
+ * as JSON — fatal. Source's tools don't stream responses, so
+ * http-only is the right transport regardless. Verified empirically
+ * 2026-05-02.
  */
 function stdioBridgeEntry(args: {
   mcpUrl: string;
@@ -66,6 +74,8 @@ function stdioBridgeEntry(args: {
       "-y",
       "mcp-remote",
       args.mcpUrl,
+      "--transport",
+      "http-only",
       "--header",
       `Authorization: Bearer ${args.bearer}`,
     ],
