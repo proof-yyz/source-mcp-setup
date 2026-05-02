@@ -1,0 +1,48 @@
+{
+  "name": "@enrollhere/source-mcp-setup",
+  "version": "0.1.0",
+  "description": "Install Source (EnrollHere's internal docs MCP server) into Claude Desktop / Claude Code / Cursor via a one-shot handshake URL — no clipboard token leak.",
+  "homepage": "https://github.com/enrollhere/source-mcp-setup",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enrollhere/source-mcp-setup.git"
+  },
+  "bugs": "https://github.com/enrollhere/source-mcp-setup/issues",
+  "license": "MIT",
+  "keywords": [
+    "enrollhere",
+    "source",
+    "mcp",
+    "claude-desktop",
+    "claude-code",
+    "cursor"
+  ],
+  "main": "./dist/index.js",
+  "bin": {
+    "source-mcp-setup": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && chmod +x dist/cli.js",
+    "prepack": "chmod +x dist/cli.js 2>/dev/null || true",
+    "prepublishOnly": "npm run build && npm test",
+    "test": "node --test --import tsx tests/*.test.ts",
+    "lint": "tsc -p tsconfig.json --noEmit"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,97 @@
+# Publish @enrollhere/source-mcp-setup to npm with provenance attestation.
+#
+# Trigger: pushed git tag matching v*.*.* (or manual workflow_dispatch).
+# Tag the commit AFTER bumping package.json version, then push the tag:
+#   npm version patch
+#   git push --follow-tags
+#
+# Provenance:
+#   * id-token: write — required for npm to mint a Sigstore-anchored
+#     attestation tying the published artifact to this exact commit.
+#   * Public registry only — `--access public` is required for
+#     scoped packages even when the org plan technically supports
+#     private packages, since provenance signing requires public.
+#   * Verifies after publish via `npm audit signatures`. CI fails if
+#     the attestation didn't actually land.
+
+name: publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Plan + lint + test, no publish"
+        type: boolean
+        default: false
+
+# OIDC token + write attestations require these top-level permissions.
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    # Red-team HIGH-6: requires manual approval from a configured
+    # reviewer in repo settings → Environments → npm-publish. Without
+    # this gate, anyone with push access to the repo can ship a version
+    # by tagging a commit. Provenance proves the artifact came from
+    # this repo + commit, but it doesn't stop a hostile insider from
+    # publishing in the first place.
+    environment: npm-publish
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          # Caches node_modules across runs.
+          cache: "npm"
+
+      - name: Install (npm ci)
+        run: npm ci
+
+      - name: Lint (tsc --noEmit)
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify package contents (no surprise files)
+        run: npm pack --dry-run 2>&1 | tee pack-output.txt
+      - name: Refuse if pack-output includes test/source files
+        run: |
+          if grep -qE "(^|/)(src|tests)/" pack-output.txt; then
+            echo "✗ npm pack would ship src/ or tests/ — fix .npmignore"
+            exit 1
+          fi
+
+      - name: Publish (with provenance)
+        if: ${{ !inputs.dry_run }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --provenance --access public
+
+      - name: Verify provenance attestation landed
+        if: ${{ !inputs.dry_run }}
+        run: |
+          # `npm audit signatures` requires a registry that hosts both
+          # the package and its attestation; npmjs.com does. Fails the
+          # job if attestation is missing or invalid.
+          PKG_NAME=$(node -p "require('./package.json').name")
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          npm audit signatures "$PKG_NAME@$PKG_VERSION" || {
+            echo "✗ provenance attestation did not verify"
+            exit 1
+          }

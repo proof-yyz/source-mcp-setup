@@ -1,0 +1,12 @@
+# Source — only ship the compiled output.
+src/
+tests/
+.github/
+tsconfig.json
+.npmignore
+
+# Editor / OS junk
+.DS_Store
+*.log
+.idea/
+.vscode/
