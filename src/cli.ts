@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * CLI entrypoint for @proof-yyz/source-mcp-setup.
+ * CLI entrypoint for @proofyyz/source-mcp-setup.
  *
  * Usage:
- *   npx @proof-yyz/source-mcp-setup <handshake-url>
- *   npx @proof-yyz/source-mcp-setup --handshake=<handshake-url>
- *   npx @proof-yyz/source-mcp-setup <url> --client=claude-desktop
- *   npx @proof-yyz/source-mcp-setup <url> --client=claude-code,cursor
- *   npx @proof-yyz/source-mcp-setup <url> --dry-run
+ *   npx @proofyyz/source-mcp-setup <handshake-url>
+ *   npx @proofyyz/source-mcp-setup --handshake=<handshake-url>
+ *   npx @proofyyz/source-mcp-setup <url> --client=claude-desktop
+ *   npx @proofyyz/source-mcp-setup <url> --client=claude-code,cursor
+ *   npx @proofyyz/source-mcp-setup <url> --dry-run
  *
  * The handshake URL is one-shot, 60-second TTL. The first successful
  * fetch consumes it; the next call to the same URL returns 410.
@@ -78,10 +78,10 @@ function parseArgs(argv: string[]): ParsedArgs {
 }
 
 const HELP = `\
-@proof-yyz/source-mcp-setup — wire Source's MCP server into Claude Desktop / Claude Code / Cursor.
+@proofyyz/source-mcp-setup — wire Source's MCP server into Claude Desktop / Claude Code / Cursor.
 
 Usage:
-  npx @proof-yyz/source-mcp-setup <handshake-url> [flags]
+  npx @proofyyz/source-mcp-setup <handshake-url> [flags]
 
 Flags:
   --client=<name>      Comma-separated subset of: ${ALL_CLIENT_NAMES.join(", ")}, all (default: all)

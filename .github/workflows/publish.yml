@@ -1,4 +1,4 @@
-# Publish @proof-yyz/source-mcp-setup to npm with provenance attestation.
+# Publish @proofyyz/source-mcp-setup to npm with provenance attestation.
 #
 # Trigger: pushed git tag matching v*.*.* (or manual workflow_dispatch).
 # Tag the commit AFTER bumping package.json version, then push the tag:
