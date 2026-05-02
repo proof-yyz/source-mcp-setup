@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * CLI entrypoint for @enrollhere/source-mcp-setup.
+ * CLI entrypoint for @proof-yyz/source-mcp-setup.
  *
  * Usage:
- *   npx @enrollhere/source-mcp-setup <handshake-url>
- *   npx @enrollhere/source-mcp-setup --handshake=<handshake-url>
- *   npx @enrollhere/source-mcp-setup <url> --client=claude-desktop
- *   npx @enrollhere/source-mcp-setup <url> --client=claude-code,cursor
- *   npx @enrollhere/source-mcp-setup <url> --dry-run
+ *   npx @proof-yyz/source-mcp-setup <handshake-url>
+ *   npx @proof-yyz/source-mcp-setup --handshake=<handshake-url>
+ *   npx @proof-yyz/source-mcp-setup <url> --client=claude-desktop
+ *   npx @proof-yyz/source-mcp-setup <url> --client=claude-code,cursor
+ *   npx @proof-yyz/source-mcp-setup <url> --dry-run
  *
  * The handshake URL is one-shot, 60-second TTL. The first successful
  * fetch consumes it; the next call to the same URL returns 410.
@@ -78,10 +78,10 @@ function parseArgs(argv: string[]): ParsedArgs {
 }
 
 const HELP = `\
-@enrollhere/source-mcp-setup — wire Source's MCP server into Claude Desktop / Claude Code / Cursor.
+@proof-yyz/source-mcp-setup — wire Source's MCP server into Claude Desktop / Claude Code / Cursor.
 
 Usage:
-  npx @enrollhere/source-mcp-setup <handshake-url> [flags]
+  npx @proof-yyz/source-mcp-setup <handshake-url> [flags]
 
 Flags:
   --client=<name>      Comma-separated subset of: ${ALL_CLIENT_NAMES.join(", ")}, all (default: all)

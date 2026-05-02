@@ -1,4 +1,4 @@
-# @enrollhere/source-mcp-setup
+# @proof-yyz/source-mcp-setup
 
 One-shot installer for **Source** — EnrollHere's internal docs MCP server — into Claude Desktop, Claude Code, and Cursor. The plain bearer token is fetched directly from Source over a single-use, 60-second handshake URL and written into the appropriate client config file. The token never touches your OS clipboard.
 
@@ -7,20 +7,20 @@ One-shot installer for **Source** — EnrollHere's internal docs MCP server — 
 Generate an install command from `/me/api-tokens` on the Source portal, then run:
 
 ```bash
-npx @enrollhere/source-mcp-setup https://source.enrollhere.com/api/v1/mcp/handshake/<id>
+npx @proof-yyz/source-mcp-setup https://source.enrollhere.com/api/v1/mcp/handshake/<id>
 ```
 
 By default this targets every supported client. To target a subset:
 
 ```bash
-npx @enrollhere/source-mcp-setup <handshake-url> --client=claude-desktop
-npx @enrollhere/source-mcp-setup <handshake-url> --client=claude-code,cursor
+npx @proof-yyz/source-mcp-setup <handshake-url> --client=claude-desktop
+npx @proof-yyz/source-mcp-setup <handshake-url> --client=claude-code,cursor
 ```
 
 To preview without writing:
 
 ```bash
-npx @enrollhere/source-mcp-setup <handshake-url> --dry-run
+npx @proof-yyz/source-mcp-setup <handshake-url> --dry-run
 ```
 
 Restart your client(s) after the writes complete.
@@ -86,7 +86,7 @@ The workflow:
 - Generate `NPM_TOKEN` with the `automation` permission and add to GitHub Actions secrets.
 - **Configure the `npm-publish` environment** in GitHub repo settings → Environments → New → "npm-publish" → add Vlad as a required reviewer. The publish workflow declares `environment: npm-publish`, which means every tag-triggered publish pauses for explicit Vlad approval before any `secrets.NPM_TOKEN`-using step runs. Without this gate, anyone with push access can ship a version.
 
-After the first publish, `npm audit signatures @enrollhere/source-mcp-setup` from any machine confirms the attestation chain.
+After the first publish, `npm audit signatures @proof-yyz/source-mcp-setup` from any machine confirms the attestation chain.
 
 ## License
 
