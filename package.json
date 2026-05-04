@@ -33,7 +33,7 @@
     "build": "rm -rf dist && tsc -p tsconfig.json && chmod +x dist/cli.js",
     "prepack": "chmod +x dist/cli.js 2>/dev/null || true",
     "prepublishOnly": "npm run build && npm test",
-    "test": "node --test --import tsx tests/*.test.ts",
+    "test": "node --test --import tsx tests/clients.test.ts tests/config-writer.test.ts tests/handshake.test.ts",
     "lint": "tsc -p tsconfig.json --noEmit"
   },
   "publishConfig": {

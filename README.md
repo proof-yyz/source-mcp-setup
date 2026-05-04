@@ -59,6 +59,8 @@ npm run build   # tsc -p tsconfig.json → dist/
 
 Tests run on Node 18, 20, 22 against ubuntu / macOS / windows in CI (`.github/workflows/ci.yml`).
 
+> **Adding a test file:** the `test` script in `package.json` lists each file explicitly (PowerShell on Windows runners doesn't expand `tests/*.test.ts` the way bash/zsh do, so globs would silently fail there). New file → add it to the `test` script.
+
 ### Publish
 
 Publication is automated via `.github/workflows/publish.yml`. It fires on a pushed tag matching `v*.*.*`:
