@@ -7,14 +7,14 @@
  * parser rejects the `{type: "http", url, headers}` shape on many
  * builds (verified empirically 2026-05-02 — Claude Desktop logs
  * "Skipped invalid MCP server config entries"). The compatible-
- * everywhere shape uses `mcp-remote` as a stdio→HTTP bridge:
+ * everywhere shape uses mcp-remote as a stdio→HTTP bridge:
  *
  *   {
  *     "command": "npx",
- *     "args": ["-y", "mcp-remote", "<URL>", "--header", "Authorization: Bearer <TOKEN>"]
+ *     "args": ["-y", "mcp-remote@<version>", "<URL>", "--header", "Authorization: Bearer <TOKEN>"]
  *   }
  *
- * `mcp-remote` is a small published proxy that exposes any HTTP MCP
+ * mcp-remote is a small published proxy that exposes any HTTP MCP
  * server as a stdio MCP server. It runs as a subprocess of Claude
  * Desktop / Code / Cursor, forwards JSON-RPC over HTTPS, returns
  * responses on stdout. Same security model — bearer is in args (not
@@ -71,7 +71,7 @@ const MCP_REMOTE_VERSION = "0.1.38";
 
 /**
  * Stdio-bridge entry. All three clients accept this shape because it
- * runs `mcp-remote` as a stdio subprocess — universally supported.
+ * runs mcp-remote as a stdio subprocess — universally supported.
  *
  * --transport http-only: skip mcp-remote's default SSE probe.
  * mcp-remote's `http-first` strategy sends a GET to the URL first to
