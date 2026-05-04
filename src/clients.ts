@@ -53,6 +53,23 @@ function homeJoin(...segments: string[]): string {
 }
 
 /**
+ * mcp-remote version pin. The bridge runs as a long-lived subprocess
+ * of Claude Desktop with the bearer token in argv — a compromised
+ * release of mcp-remote (cf. event-stream / ua-parser-js precedents)
+ * would exfiltrate every EH employee's token on next session. Pin to
+ * a known-good version; bump only after auditing the upstream tarball.
+ *
+ * Update procedure (~10 min):
+ *   1. npm view mcp-remote versions --json | tail -10
+ *   2. Inspect the diff: https://github.com/geelen/mcp-remote/compare/v<old>...v<new>
+ *   3. Verify no new network calls, no telemetry, no auto-update logic
+ *   4. Bump the constant below + the npm package version, publish
+ *
+ * Tracked: pinned 2026-05-02 at upstream's then-latest.
+ */
+const MCP_REMOTE_VERSION = "0.1.38";
+
+/**
  * Stdio-bridge entry. All three clients accept this shape because it
  * runs `mcp-remote` as a stdio subprocess — universally supported.
  *
@@ -72,7 +89,7 @@ function stdioBridgeEntry(args: {
     command: "npx",
     args: [
       "-y",
-      "mcp-remote",
+      `mcp-remote@${MCP_REMOTE_VERSION}`,
       args.mcpUrl,
       "--transport",
       "http-only",

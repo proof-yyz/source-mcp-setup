@@ -59,6 +59,36 @@ jobs:
       - name: Install (npm ci)
         run: npm ci
 
+      # Red-team H1 — verify the package name in package.json hasn't
+      # silently drifted to an unintended scope. Without this guard, a
+      # typo or hostile PR could publish to a scope someone else owns
+      # while still carrying provenance attestation pointing at this
+      # repo (legitimate-looking).
+      - name: Verify package scope
+        run: |
+          NAME=$(node -p "require('./package.json').name")
+          EXPECTED="@proofyyz/source-mcp-setup"
+          if [ "$NAME" != "$EXPECTED" ]; then
+            echo "✗ unexpected package name: $NAME (expected $EXPECTED)"
+            echo "  If this rename is intentional, update the EXPECTED constant"
+            echo "  in .github/workflows/publish.yml in the SAME commit."
+            exit 1
+          fi
+          echo "✓ package name matches expected: $NAME"
+
+      - name: Verify pinned mcp-remote not floating to latest
+        run: |
+          # Round-2 red-team HIGH-3 — broaden quote handling. Catches
+          # double / single / template-literal forms of unpinned
+          # mcp-remote. The `npm test` step is the load-bearing
+          # assertion (semver regex on args[1]); this grep is a faster
+          # early signal in CI.
+          if grep -qE "['\"\`]mcp-remote['\"\`][^@]" src/clients.ts; then
+            echo "✗ src/clients.ts contains unpinned mcp-remote"
+            exit 1
+          fi
+          echo "✓ mcp-remote is version-pinned"
+
       - name: Lint (tsc --noEmit)
         run: npm run lint
 

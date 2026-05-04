@@ -29,7 +29,10 @@ const BASE58_PATTERN = /^[1-9A-HJ-NP-Za-km-z]+$/;
  * Defense: hardcode the legitimate hosts here. Override with
  * --mcp-host-override=<host> for staging/dev only, with a noisy warning.
  */
-export const PRODUCTION_MCP_HOSTS = ["source.enrollhere.com"];
+export const PRODUCTION_MCP_HOSTS = [
+  "source.enrollhere.com",        // future — once DNS is wired to the Vercel deploy
+  "source-portal-chi.vercel.app", // current Vercel deploy
+];
 const DEV_MCP_HOST_PATTERN = /^(?:localhost|127\.\d+\.\d+\.\d+)(?::\d+)?$/;
 
 export interface HandshakePayload {

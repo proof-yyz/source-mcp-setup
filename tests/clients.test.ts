@@ -39,15 +39,41 @@ test("buildServerEntry produces stdio bridge config (npx mcp-remote ...) for all
     const e = entry as Record<string, unknown>;
     assert.equal(e.command, "npx");
     const args = e.args as string[];
-    assert.deepEqual(args, [
-      "-y",
-      "mcp-remote",
+    // mcp-remote is version-pinned to defeat supply-chain attacks
+    // against the unpinned `npx -y mcp-remote` path. The exact version
+    // matters less than the "@<version>" suffix existing — assert that
+    // the second arg starts with "mcp-remote@".
+    assert.equal(args[0], "-y");
+    assert.ok(
+      args[1] && args[1].startsWith("mcp-remote@"),
+      `expected pinned mcp-remote, got ${args[1]}`,
+    );
+    assert.deepEqual(args.slice(2), [
       "https://source.example/api/mcp",
       "--transport",
       "http-only",
       "--header",
       "Authorization: Bearer src_test",
     ]);
+  }
+});
+
+test("buildServerEntry pins mcp-remote to a specific version (no `latest` floating)", () => {
+  // Red-team C3 — without a version pin, every Claude Desktop session
+  // pulls fresh mcp-remote from npm. A compromised release leaks every
+  // EH bearer. The pin is the single most important supply-chain control.
+  for (const name of ALL_CLIENT_NAMES) {
+    const entry = CLIENTS[name].buildServerEntry({
+      mcpUrl: "https://source.example/api/mcp",
+      bearer: "src_test",
+    });
+    const args = (entry as Record<string, unknown>).args as string[];
+    assert.notEqual(args[1], "mcp-remote", `${name} must not use unpinned mcp-remote`);
+    assert.match(
+      args[1] ?? "",
+      /^mcp-remote@\d+\.\d+\.\d+$/,
+      `${name} must pin a semver, got ${args[1]}`,
+    );
   }
 });
 
